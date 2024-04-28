@@ -48,10 +48,12 @@
   "ts-node": "^10.9.2",
   "tsc-watch": "^6.0.4",
   "typedoc": "^0.25.8",
-  "typescript": "^5.4.2",
+  "typescript": "^5.4.5",
   "yargs": "^17.7.2"
  },
  "dependencies": {
-  "mongodb": "^6.5.0"
+  "body-parser": "^1.20.2",
+  "mongodb": "^6.5.0",
+  "node": "^22.0.0"
  }
 }

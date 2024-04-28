@@ -1,19 +1,16 @@
- import { Document, connect, model, Schema } from "mongoose";
+import { Document, connect, model, Schema } from "mongoose";
 
-connect("mongodb://127.0.0.1:27017/furnitures")
+connect("mongodb+srv://alu0101:123@dsipractica13.pqujcp0.mongodb.net/main")
   .then(() => {
-    console.log("Connected to the furnitures database");
+    console.log("Connected to the furniture collection");
   })
   .catch(() => {
-    console.log(
-      "Something went wrong when conecting to the furniture database",
-    );
+    console.log("SomethingAAAA went wrong when conecting to the furniture database");
   });
 
 interface Furniture extends Document {
-	id: string;
   name: string;
-	type: string;
+  type: string;
   description: string;
   material: string;
   dimensions: string;

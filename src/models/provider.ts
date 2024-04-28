@@ -1,13 +1,11 @@
 import { Document, connect, model, Schema } from "mongoose";
 
-connect("mongodb://127.0.0.1:27017/providers")
+connect("mongodb+srv://alu0101:123@dsipractica13.pqujcp0.mongodb.net/main")
   .then(() => {
-    console.log("Connected to the providers database");
+    console.log("Connected to the provider collection");
   })
   .catch(() => {
-    console.log(
-      "Something went wrong when conecting to the providers database",
-    );
+    console.log("SomethingAAAA went wrong when conecting to the provider database");
   });
 
 interface IProvider extends Document {
