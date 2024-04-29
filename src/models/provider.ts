@@ -19,7 +19,7 @@ export const providerSchema: Schema = new Schema<IProvider>({
   name: { type: String, required: true },
   contact: { type: String, required: true },
   address: { type: String, required: true },
-  cif: { type: String, required: true },
+  cif: { type: String, required: true, unique: true },
 });
 
 export default model<IProvider>("Provider", providerSchema);

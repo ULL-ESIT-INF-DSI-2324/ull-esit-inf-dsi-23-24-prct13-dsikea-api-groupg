@@ -16,7 +16,7 @@ interface CustomerInterface extends Document {
 }
 
 export const customerSchema: Schema = new Schema<CustomerInterface>({
-  nif: { type: String, required: true },
+  nif: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   contact: { type: String, required: true },
   address: { type: String, required: true },

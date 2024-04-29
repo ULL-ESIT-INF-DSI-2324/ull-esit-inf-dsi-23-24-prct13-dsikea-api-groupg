@@ -4,7 +4,7 @@ import { customerRouter } from './routes/customer_route.js';
 import { providerRouter } from './routes/provider_route.js';
 import { defaultRouter } from './routes/default_route.js';
 import { furnitureRouter } from './routes/furniture_route.js';
-
+import { transactionRouter } from './routes/transaction_route.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,13 +12,10 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(bodyParser.raw());
 
-
-// Montar las rutas de la API
 app.use(customerRouter);
 app.use(providerRouter);
 app.use(furnitureRouter);
-//app.use('/transactions', transactionRouter);
-
+app.use(transactionRouter);
 
 app.use(defaultRouter);
 
