@@ -17,7 +17,9 @@ function checkCorrectQuery(query: any) {
 async function calculateAmount(furnitureList: any) {
 	let amount = 0;
 	for (const furniture of furnitureList) {
-		const requestedFurniture = await Furniture.findOne({ name: furniture.name });
+		let requestedFurniture;
+		if (!furniture.name && furniture._id) requestedFurniture = await Furniture.findById(furniture._id);
+		else if (furniture.name) requestedFurniture = await Furniture.findOne({ name: furniture.name });
 		if (requestedFurniture) amount += requestedFurniture.price * furniture.quantity;
 	}
 	return amount;
@@ -221,14 +223,13 @@ transactionRouter.delete('/transactions/:id', async (req, res) => {
 		}
 		if (transaction.type === 'Venta') {
 			for (const furniture of transaction.furniture) {
-				console.log(furniture.get('_id'));
-				/* const requestedFurniture = await Furniture.findById(furniture._id);
+				const requestedFurniture = await Furniture.findById(furniture._id);
 				if (requestedFurniture) {
 					requestedFurniture.currentStock += furniture.quantity;
 					await requestedFurniture.save();
-				} */
+				}
 			}
-		} /* else if (transaction.type === 'Compra') {
+		} else if (transaction.type === 'Compra') {
 			for (const furniture of transaction.furniture) {
 				const requestedFurniture = await Furniture.findById(furniture._id);
 				if (requestedFurniture) {
@@ -237,37 +238,84 @@ transactionRouter.delete('/transactions/:id', async (req, res) => {
 				}
 			}
 		}
-		await transaction.remove(); */
-		return res.send(transaction);
+		await Transaction.findByIdAndDelete(req.params.id);
+		return res.status(200).send({ message: "Transaction deleted" });
 	} catch (error) {
 		return res.status(500).send({ error: "Error deleting transaction" });
 	}
 }
 );
 
-// UPDATE TRANSACTION BY ID
+// UPDATE TRANSACTION BY ID AND UPDATE STOCK
 transactionRouter.patch('/transactions/:id', async (req, res) => {
-	const updates = Object.keys(req.body);
-	const allowedUpdates = ['date', 'provider', 'customer'];
-	const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
-	if (!isValidOperation) {
-		return res.status(400).send({ error: 'Invalid updates!' });
-	}
 	try {
-		const transaction = await Transaction.findOneAndUpdate({
-			_id: req.params.id
-		},
-			req.body,
-			{
-				new: true,
-				runValidators: true
-			});
-
-		if (transaction) {
-			return res.send(transaction);
+		const transaction = await Transaction.findById(req.params.id);
+		if (!transaction) {
+			return res.status(404).send({ error: "Transaction not found" });
 		}
-		return res.status(404).send();
+
+		if (req.body.cif) {
+			const provider = await Provider.findOne({ cif: req.body.cif });
+			if (!provider) {
+				return res.status(404).send({ error: "Provider not found" });
+			}
+			req.body.provider = provider;
+		} else if (req.body.nif) {
+			const customer = await Customer.findOne({ nif: req.body.nif });
+			if (!customer) {
+				return res.status(404).send({ error: "Customer not found" });
+			}
+			req.body.customer = customer;
+		}
+
+		if(req.body.furniture){
+			if (transaction.type === 'Venta') {
+				for (const furniture of req.body.furniture) {
+					for (const oldFurniture of transaction.furniture) {
+						const requestedFurniture = await Furniture.findById(furniture._id);
+						if (requestedFurniture!._id.toString() === oldFurniture._id.toString() && 
+								furniture.quantity !== oldFurniture.quantity) {
+							const newStockSold = oldFurniture.quantity - furniture.quantity;
+							const stockToReturn = requestedFurniture!.currentStock + newStockSold;
+							if (requestedFurniture && stockToReturn >= 0) {
+								requestedFurniture.currentStock = stockToReturn;
+								await requestedFurniture.save();
+							} else {
+								return res.status(400).send({ error: "Insufficient stock for requested furniture or furniture not found" });
+							}
+						}
+					}
+
+				}	
+			} else if (transaction.type === 'Compra') {
+				for (const furniture of req.body.furniture) {
+					for (const oldFurniture of transaction.furniture) {
+						const requestedFurniture = await Furniture.findById(furniture._id);
+						if (requestedFurniture!._id.toString() === oldFurniture._id.toString() && 
+								furniture.quantity !== oldFurniture.quantity) {
+							const newStockBought = furniture.quantity - oldFurniture.quantity;
+							if (requestedFurniture) {
+								requestedFurniture.currentStock += newStockBought;
+								await requestedFurniture.save();
+							} else {
+								return res.status(400).send({ error: "Couldnt find furniture" });
+							}
+						}
+					}
+				}
+			}
+			req.body.amount = await calculateAmount(req.body.furniture);
+		}
+
+		const updatedTransaction = await Transaction.findByIdAndUpdate(req
+			.params.id, req
+			.body, { new: true });
+		if (updatedTransaction) {
+			return res.send(updatedTransaction);
+		}
+		return res.status(404).send({ error: "Transaction not found" });
 	} catch (error) {
-		return res.status(500).send(error);
+		return res.status(500).send({ error: "Error updating transaction" });
 	}
-});
+}
+);

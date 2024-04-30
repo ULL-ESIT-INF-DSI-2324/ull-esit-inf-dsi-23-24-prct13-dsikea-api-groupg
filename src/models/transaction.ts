@@ -15,7 +15,10 @@ connect("mongodb+srv://alu0101:123@dsipractica13.pqujcp0.mongodb.net/main")
 // Definición de la interfaz para el documento de transacción
 interface Transaction extends Document {
   type: "Compra" | "Venta";
-  furniture: (typeof furnitureSchema)[];
+  furniture: {
+    _id: typeof furnitureSchema;
+    quantity: number;
+  }[];
   customer?: typeof customerSchema;
   provider?: typeof providerSchema;
   amount: number;
