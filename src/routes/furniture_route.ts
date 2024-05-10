@@ -25,7 +25,7 @@ furnitureRouter.get("/furniture", async (req, res) => {
 	}
 });
 
-//DELETE furniture BY NIF WITH QUERY
+//DELETE furniture BY name WITH QUERY
 furnitureRouter.delete("/furniture/delete", async (req, res) => {
 	try {
 		const furniture = await Furniture.findOneAndDelete(req.query);
