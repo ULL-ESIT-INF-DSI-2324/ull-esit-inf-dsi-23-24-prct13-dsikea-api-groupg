@@ -7,7 +7,8 @@
  "scripts": {
   "test-all": "mocha ./tests/**/*.spec.ts --exit",
   "coverage": "c8 npm test && c8 report --reporter=lcov",
-  "start": "tsc && node dist/app.js",
+  "start": "node dist/app.js",
+  "build": "tsc",
   "doc": "typedoc --out docs src/**/*.ts; touch docs/.nojekyll"
  },
  "keywords": [],
