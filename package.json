@@ -5,7 +5,7 @@
  "main": "index.js",
  "type": "module",
  "scripts": {
-  "test-all": "mocha ./tests/**/*.spec.ts --exit",
+  "test": "mocha ./tests/**/*.spec.ts --exit",
   "coverage": "c8 npm test && c8 report --reporter=lcov",
   "start": "node dist/app.js",
   "build": "tsc",
