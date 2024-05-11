@@ -15,16 +15,19 @@ describe('POST /customers', () => {
 		}).expect(200);
 	});
 });
+
 describe('GET /customers', () => {
 	it('Should successfully get all customers', async () => {
 		await request(app).get('/customers').expect(200);
 	});
 });
+
 describe('DELETE /customers', () => {
 	it('Should successfully delete a customer by query', async () => {
 		await request(app).delete('/customers/delete?nif=example').expect(200);
 	});
 });
+
 describe('POST /customers', () => {
 	it('Should successfully create a new customer', async () => {
 		await request(app).post('/customers').send({
@@ -35,6 +38,7 @@ describe('POST /customers', () => {
 		}).expect(200);
 	});
 });
+
 describe('PATCH /customers', () => {
 	it('Should successfully update a customer by query', async () => {
 		await request(app).patch('/customers/update?nif=example').send({
@@ -44,12 +48,14 @@ describe('PATCH /customers', () => {
 			address: "testAddress2"
 		}).expect(200);
 	});
+
 	it('Should check if the customer was updated', async () => {
 		const res = await request(app).get('/customers');
 		const customer = res.body.find((customer: { name: string; }) => customer.name === 'testCustomer');
 		chaiExpect(customer.address).to.equal('testAddress2');
 	});
 });
+
 describe('DELETE /customers', () => {
 	it('Should successfully delete a customer by query', async () => {
 		await request(app).delete('/customers/delete?nif=example').expect(200);
@@ -65,6 +71,7 @@ describe('PATCH /customers', () => {
 			address: "testAddress"
 		}).expect(200);
 	});
+
 	it('Should successfully update a customer by id', async () => {
 		const res = await request(app).get('/customers');
 		const customer = res.body.find((customer: { name: string; }) => customer.name === 'testCustomer');
@@ -75,12 +82,16 @@ describe('PATCH /customers', () => {
 			address: "testAddress2"
 		}).expect(200);
 	});
+
 	it('Should check if the customer was updated', async () => {
 		const res = await request(app).get('/customers');
 		const customer = res.body.find((customer: { name: string; }) => customer.name === 'testCustomer');
 		chaiExpect(customer.address).to.equal('testAddress2');
 	});
+
+	it('Should successfully delete a customer by id', async () => {
+		const res = await request(app).get('/customers');
+		const customer = res.body.find((customer: { name: string; }) => customer.name === 'testCustomer');
+		await request(app).delete(`/customers/${customer._id}`).expect(200);
+	});
 });
-
-
-
